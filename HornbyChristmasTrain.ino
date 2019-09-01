@@ -1,18 +1,27 @@
 #include "MotorChannel.h"
+#include "LoggerFactory.h"
+#include "Logger.h"
+#include "SerialLogSink.h"
 
-const int PIN_CHANNEL_A_DIRECTION = 12;
-const int PIN_CHANNEL_A_BRAKE = 9;
-const int PIN_CHANNEL_A_SPEED = 3;
+using namespace Logging;
+using namespace MotorShield;
 
-MotorChannel* motorChannelA;
+
+MotorChannel* motorChannel;
+
+Logger *LOG = NULL;
 
 void setup()
 {
   Serial.begin(9600);
 
-  Serial.println("Initializing Channel A of Motor Shield");
+  LoggerFactory::initFactory(new SerialLogSink(), LogLevel::DEBUG);
 
-  motorChannelA = new MotorChannel(ChannelAPinConfiguration, 12, 10);
+  LOG = LoggerFactory::get()->createLogger("main", LogLevel::DEBUG);
+
+  LOG->debug("Initializing Channel A of Motor Shield");
+
+  motorChannel = new MotorChannel(ChannelAPinConfiguration, 12, 10);
 }
 
 void loop()
@@ -24,62 +33,62 @@ void loop()
 
 void forwardAndReverseTest()
 {
-  Serial.println("Spinning motor on channel A at full speed in forward direction");
+  LOG->debug("Spinning motor on channel A at full speed in forward direction");
 
-  motorChannelA->moveForward();
-  motorChannelA->disengageBrake();
-  motorChannelA->setSpeed(100);
+  motorChannel->moveForward();
+  motorChannel->disengageBrake();
+  motorChannel->setSpeed(100);
 
   delay(3000);
 
-  Serial.println("Applying brake to channel A");
+  LOG->debug("Applying brake to channel A");
   
-  motorChannelA->engageBrake();
+  motorChannel->engageBrake();
   
   delay(3000);
 
-  Serial.println("Spinning motor on channel A at half speed in reverse direction");
+  LOG->debug("Spinning motor on channel A at half speed in reverse direction");
 
-  motorChannelA->moveReverse();
-  motorChannelA->disengageBrake();
-  motorChannelA->setSpeed(50);
+  motorChannel->moveReverse();
+  motorChannel->disengageBrake();
+  motorChannel->setSpeed(50);
     
   delay(3000);
 
-  Serial.println("Spinning motor on channel A to full speed over a period of 5 seconds");
+  LOG->debugf("Spinning motor on channel A to full speed over a period of %u seconds", 5);
 
-  motorChannelA->moveForward();
-  motorChannelA->disengageBrake();
-  motorChannelA->setSpeed(0);
+  motorChannel->moveForward();
+  motorChannel->disengageBrake();
+  motorChannel->setSpeed(0);
 
-  motorChannelA->accelerateTo(100, 5000);
+  motorChannel->accelerateTo(100, 5000);
     
   delay(3000);
 
-  Serial.println("Applying brake to channel A");
+  LOG->debug("Applying brake to channel A");
   
-  motorChannelA->engageBrake();
+  motorChannel->engageBrake();
   
   delay(2000);
 }
 
 void incrementTest()
 {
-  Serial.println("Spinning motor on channel A to full speed in increments");
+  LOG->debug("Spinning motor on channel A to full speed in increments");
 
-  motorChannelA->moveForward();
-  motorChannelA->disengageBrake();
+  motorChannel->moveForward();
+  motorChannel->disengageBrake();
 
   for(int speedStep = 0; speedStep <= 100; speedStep++)
   {
-    motorChannelA->setSpeed(speedStep);
+    motorChannel->setSpeed(speedStep);
 
     delay(50);
   }
 
-  Serial.println("Applying brake to channel A");
+  LOG->debug("Applying brake to channel A");
 
-  motorChannelA->engageBrake();
+  motorChannel->engageBrake();
 
   delay(1000);
 }

@@ -1,7 +1,17 @@
+#include "LogLevel.h"
+#include "Logger.h"
+#include "LoggerFactory.h"
+
 #include "MotorChannel.h"
 
-MotorChannel::MotorChannel(MotorChannelPinConfiguration pinConfiguration, int powerVoltage, int maxChannelVoltage)
-{
+using namespace Logging;
+using namespace MotorShield;
+
+
+Logger *MotorChannel::LOG = LoggerFactory::get()->createLogger("MotorChannel", LogLevel::DEBUG);
+
+MotorShield::MotorChannel::MotorChannel(ChannelPinConfiguration pinConfiguration, int powerVoltage, int maxChannelVoltage)
+{ 
   this->_pinConfiguration = pinConfiguration;
   this->_powerVoltage = powerVoltage;
   this->_maxChannelVoltage = maxChannelVoltage;
@@ -14,34 +24,34 @@ MotorChannel::MotorChannel(MotorChannelPinConfiguration pinConfiguration, int po
   this->setSpeed(0);
 }
 
-void MotorChannel::moveForward()
+void MotorShield::MotorChannel::moveForward()
 {
   digitalWrite(this->_pinConfiguration.DIRECTION_PIN, HIGH);
 }
 
-void MotorChannel::moveReverse()
+void MotorShield::MotorChannel::moveReverse()
 {
   digitalWrite(this->_pinConfiguration.DIRECTION_PIN, LOW);
 }
 
-void MotorChannel::disengageBrake()
+void MotorShield::MotorChannel::disengageBrake()
 {
   digitalWrite(this->_pinConfiguration.BRAKE_PIN, LOW);
 }
 
-void MotorChannel::engageBrake()
+void MotorShield::MotorChannel::engageBrake()
 {
   digitalWrite(this->_pinConfiguration.BRAKE_PIN, HIGH);
 }
 
-void MotorChannel::setSpeed(int speedPercentage)
+void MotorShield::MotorChannel::setSpeed(int speedPercentage)
 {
   int speedStep = this->speedPercentagetoSpeedStep(speedPercentage);
 
   this->setSpeedStep(speedStep);
 }
 
-void MotorChannel::accelerateTo(int speedPercentage, int timeMillis)
+void MotorShield::MotorChannel::accelerateTo(int speedPercentage, int timeMillis)
 {
   int desiredSpeedStep = this->speedPercentagetoSpeedStep(speedPercentage);
 
@@ -65,14 +75,14 @@ void MotorChannel::accelerateTo(int speedPercentage, int timeMillis)
 
   int endTime = millis();
 
-  Serial.println(endTime - startTime);
+  LOG->debugf("accelerateTo finished in %u ms", endTime - startTime);
 }
 
-void MotorChannel::decelerateTo(int speedPercentage, int timeMillis)
+void MotorShield::MotorChannel::decelerateTo(int speedPercentage, int timeMillis)
 {
 }
 
-void MotorChannel::setSpeedStep(int speedStep)
+void MotorShield::MotorChannel::setSpeedStep(int speedStep)
 {
   if (speedStep > 255) speedStep = 255;
   if (speedStep < 0) speedStep = 0;
@@ -82,7 +92,7 @@ void MotorChannel::setSpeedStep(int speedStep)
   analogWrite(this->_pinConfiguration.SPEED_PIN, speedStep);
 }
 
-int MotorChannel::speedPercentagetoSpeedStep(int speedPercentage)
+int MotorShield::MotorChannel::speedPercentagetoSpeedStep(int speedPercentage)
 {
   if (speedPercentage > 100) speedPercentage = 100;
   if (speedPercentage < 0) speedPercentage = 0;
