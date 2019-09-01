@@ -80,6 +80,7 @@ void MotorShield::MotorChannel::accelerateTo(int speedPercentage, int timeMillis
 
 void MotorShield::MotorChannel::decelerateTo(int speedPercentage, int timeMillis)
 {
+  // TODO
 }
 
 void MotorShield::MotorChannel::setSpeedStep(int speedStep)
